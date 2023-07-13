@@ -1,0 +1,44 @@
+---
+- hosts: grupo2
+  become: true
+  user: ctladmin
+  tasks:
+    - name: Descargar Agente Zabbix
+      ansible.builtin.shell: wget https://repo.zabbix.com/zabbix/5.2/ubuntu/pool/main/z/zabbix-release/zabbix-release_5.2-1+ubuntu20.04_all.deb 
+      args:
+        executable: /bin/bash
+    - name: Descomprimir Agente Zabbix
+      ansible.builtin.shell: dpkg -i zabbix-release_5.2-1+ubuntu20.04_all.deb
+      args:
+        executable: /bin/bash
+    - name: Instalar Agente Zabbix
+      ansible.builtin.shell: apt install -y zabbix-agent
+      args:
+        executable: /bin/bash
+    - name: Habilitar Servicio  Zabbix
+      ansible.builtin.shell: systemctl enable zabbix-agent
+      args:
+        executable: /bin/bash
+    - name: Reiniciar Servicio  Zabbix
+      ansible.builtin.shell: systemctl restart zabbix-agent
+      args:
+        executable: /bin/bash
+    - name: Reemplazar server-zabbix 
+      replace:
+        path: /etc/zabbix/zabbix_agentd.conf
+        regexp: 'Server=127.0.0.1'
+        replace: 'Server=monitoreo.belcorp.biz'
+        backup: yes
+    - name: Reemplazar server_active-zabbix
+      replace:
+        path: /etc/zabbix/zabbix_agentd.conf
+        regexp: 'ServerActive=127.0.0.1'
+        replace: 'ServerActive=monitoreo.belcorp.biz'
+        backup: yes
+    - name: Reemplazar Hostname-zabbix
+      replace:
+        path: /etc/zabbix/zabbix_agentd.conf
+        regexp: '# Hostname='
+        replace: 'Hostname=ubuntu2.galileo.ebel'
+        backup: yes
+...
